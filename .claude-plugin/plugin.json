@@ -1,5 +1,5 @@
 {
-  "name": "firefly-harness",
+  "name": "firefly",
   "version": "0.1.0",
   "description": "A harness plugin for Claude Code bundling a set of skills and subagents to streamline development, review, and testing workflows.",
   "author": {

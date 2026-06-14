@@ -1,5 +1,5 @@
 ---
-name: demo-create-implementation-plan
+name: create-implementation-plan
 description: Turn a `.workflow/requisites/<id>-<slug>.md` file into a vertical-slice implementation plan plus one user-story file per slice. Reads PRODUCT.md, ARCHITECTURE.md, UBIQUITOUS_LANGUAGE.md, and the requisites file; writes `.workflow/implementation-plans/<id>-<slug>.md` and `.workflow/tasks/<id>-<slug>/US-XXX.md`. Use AFTER the requisites interview, BEFORE implementation.
 argument-hint: "<requisites file path, feature slug, ID, or feature name>"
 arguments:

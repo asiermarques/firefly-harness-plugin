@@ -62,9 +62,8 @@ your-project/
 ```
 firefly-harness-plugin/
 ├── .claude-plugin/
-│   └── plugin.json                # Plugin manifest (name, version, metadata)
-├── commands/
-│   └── harness-check.md           # /harness-check slash command
+│   ├── plugin.json                # Plugin manifest (name, version, metadata)
+│   └── marketplace.json           # Marketplace manifest (lets the repo be installed directly)
 ├── skills/                        # One folder with a SKILL.md per skill
 │   ├── ubiquitous-language/
 │   ├── requisites-interview/
@@ -80,44 +79,23 @@ firefly-harness-plugin/
 
 ## Installation
 
-### Option A — Local marketplace (recommended for development)
+A plugin is always installed **through a marketplace**. This repo doubles as its own
+marketplace: `.claude-plugin/marketplace.json` declares the `firefly-harness` marketplace
+and points it at the `firefly` plugin (`"source": "."`). So adding the repo as a
+marketplace is all you need.
 
-A plugin is installed through a marketplace. The quickest path while developing is to point Claude Code at a local marketplace that lists this plugin.
+The plugin is published at
+[`asiermarques/firefly-harness-plugin`](https://github.com/asiermarques/firefly-harness-plugin).
+Inside Claude Code, on any machine:
 
-1. Create a marketplace manifest somewhere on your machine, e.g. `~/my-marketplace/.claude-plugin/marketplace.json`:
+```
+/plugin marketplace add asiermarques/firefly-harness-plugin
+/plugin install firefly@firefly-harness
+```
 
-   ```json
-   {
-     "name": "local-dev",
-     "owner": { "name": "Asier Marques" },
-     "plugins": [
-       {
-         "name": "firefly-harness",
-         "source": "/Users/asiermarques/Documents/projects/claude-training/firefly-harness-plugin",
-         "description": "Spec-driven development workflow skills for Claude Code."
-       }
-     ]
-   }
-   ```
+(`firefly` is the plugin name, `firefly-harness` is the marketplace name.)
 
-2. Add the marketplace and install the plugin from within Claude Code:
-
-   ```
-   /plugin marketplace add ~/my-marketplace
-   /plugin install firefly-harness@local-dev
-   ```
-
-### Option B — From a Git repository
-
-1. Push this plugin (or a marketplace that references it) to a Git host.
-2. In Claude Code:
-
-   ```
-   /plugin marketplace add <your-org>/<your-repo>
-   /plugin install firefly-harness@<marketplace-name>
-   ```
-
-After installing, restart Claude Code (or run `/plugin` and reload) so the new skills and command are picked up.
+After installing, restart Claude Code (or run `/plugin` and reload) so the new skills are picked up.
 
 ## Usage
 
@@ -130,8 +108,6 @@ Run the workflow skills in order for a new feature:
 5. **Review** — ask Claude to review the changes; it pulls in `project-review-methodology` and the specialized `project-review-*` skills automatically and returns prioritized findings.
 
 Outside this linear flow, invoke `architecture-discussion` whenever you want to think through a design, evaluate a technology choice, weigh trade-offs, or capture an architecture decision as an ADR — before, during, or after the pipeline.
-
-At any point, run `/harness-check` to confirm lint, build, and tests are green.
 
 You can confirm what loaded with `/plugin` (lists installed plugins).
 

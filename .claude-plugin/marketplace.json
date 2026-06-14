@@ -1,0 +1,11 @@
+{
+  "name": "firefly-harness",
+  "owner": { "name": "Asier Marques", "email": "asiermarques@gmail.com" },
+  "plugins": [
+    {
+      "name": "firefly",
+      "source": ".",
+      "description": "Spec-driven development workflow skills for Claude Code."
+    }
+  ]
+}
