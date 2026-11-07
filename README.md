@@ -104,7 +104,42 @@ Inside Claude Code, on any machine:
 
 (`firefly` is the plugin name, `firefly-harness` is the marketplace name.)
 
-After installing, restart Claude Code (or run `/plugin` and reload) so the new skills are picked up.
+After installing, restart Claude Code (or run `/reload-plugins`) so the new skills are picked up.
+
+### Updating
+
+Auto-update is off by default, so pull new versions yourself. Inside Claude Code:
+
+1. Open `/plugin` → **Marketplaces** tab → select `firefly-harness` → **Update marketplace**.
+   This refreshes the listing and updates the plugins installed from it.
+   (Alternatively: **Installed** tab → `firefly` → **Update now**.)
+2. Run `/reload-plugins` (or start a new session) to load the new version.
+
+Or from your shell:
+
+```bash
+claude plugin marketplace update firefly-harness   # refresh the marketplace listing
+claude plugin update firefly@firefly-harness       # install the newer plugin version
+```
+
+`claude plugin marketplace update` alone only refreshes the listing — it doesn't touch
+installed plugins, so run both. If nothing newer is published you'll see
+`firefly is already at the latest version (…)`.
+
+An update is only detected when the `version` in `.claude-plugin/plugin.json` changes on
+GitHub — see [Publishing changes](#publishing-changes).
+
+### Trying local changes before publishing
+
+The installed plugin comes from GitHub, not from your working copy. To test unpublished
+edits, swap the GitHub marketplace for your local clone (both declare the same
+`firefly-harness` name, so remove the GitHub one first):
+
+```
+/plugin marketplace remove firefly-harness
+/plugin marketplace add ./path/to/firefly-harness-plugin
+/plugin install firefly@firefly-harness
+```
 
 ## Usage
 
@@ -128,7 +163,11 @@ You can confirm what loaded with `/plugin` (lists installed plugins).
 - **Add a command** — create `commands/<name>.md`; the file body is the prompt, and `$ARGUMENTS` is substituted with whatever the user types after the command.
 - **Adapt to your stack** — the skills reference a `docs/` + `.workflow/` layout and a layered backend / vertical-slice convention. Adjust the SKILL.md bodies to match your project's actual conventions.
 
-Bump the `version` in `.claude-plugin/plugin.json` whenever you publish changes.
+### Publishing changes
+
+1. Bump the `version` in `.claude-plugin/plugin.json` (semver: patch for fixes, minor for new skills or behavior changes). Without a version bump, installed copies won't see the update.
+2. Commit and push to `main`.
+3. Update the installed plugin as described in [Updating](#updating).
 
 ## License
 
