@@ -6,11 +6,9 @@ The skills are deliberately stack-agnostic — they encode a *methodology* (DDD 
 
 ## The workflow
 
-```
-ubiquitous-language ──► requisites-interview ──► create-implementation-plan ──► implement-task ──► (review)
-   (domain glossary)      (.workflow/requisites)   (.workflow/implementation-      (TDD + docs       project-review-*
-                                                     plans + tasks/US-XXX)          update)
-```
+<p align="center">
+  <img src="assets/workflow.svg" alt="Firefly workflow: 1 ubiquitous-language → 2 requisites-interview → 3 create-implementation-plan → 4 implement-task → 5 project-review-methodology. architecture-discussion runs at any time and records ADRs; github-project-tracking is shared by steps 3 and 4; step 5 pulls in the security, testing, and docs-consistency reviews." width="100%">
+</p>
 
 ## What's inside
 
@@ -72,6 +70,8 @@ firefly-harness-plugin/
 ├── .claude-plugin/
 │   ├── plugin.json                # Plugin manifest (name, version, metadata)
 │   └── marketplace.json           # Marketplace manifest (lets the repo be installed directly)
+├── assets/
+│   └── workflow.svg               # Workflow diagram used in this README
 ├── skills/                        # One folder with a SKILL.md per skill
 │   ├── ubiquitous-language/
 │   ├── requisites-interview/

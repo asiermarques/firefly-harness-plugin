@@ -1,0 +1,130 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="940" height="640" viewBox="0 0 940 640" role="img" aria-labelledby="title desc">
+  <title id="title">Firefly workflow</title>
+  <desc id="desc">Five-step pipeline: ubiquitous-language, requisites-interview, create-implementation-plan, implement-task, and project review. architecture-discussion can run at any time and records ADRs. github-project-tracking is shared by the plan and implement steps. The review step pulls in the security, testing, and docs-consistency review skills.</desc>
+  <defs>
+    <style>
+      .bg      { fill: #ffffff; }
+      .card    { fill: #f6f8fa; stroke: #d0d7de; stroke-width: 1; }
+      .side    { fill: #ffffff; stroke: #8c959f; stroke-width: 1; stroke-dasharray: 5 4; }
+      .badge   { fill: #0969da; }
+      .badge-t { fill: #ffffff; font: 600 14px system-ui, -apple-system, "Segoe UI", sans-serif; }
+      .h1      { fill: #1f2328; font: 700 20px system-ui, -apple-system, "Segoe UI", sans-serif; }
+      .sub     { fill: #59636e; font: 400 13px system-ui, -apple-system, "Segoe UI", sans-serif; }
+      .name    { fill: #1f2328; font: 600 14px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+      .text    { fill: #1f2328; font: 400 13px system-ui, -apple-system, "Segoe UI", sans-serif; }
+      .out     { fill: #59636e; font: 400 12px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+      .tag     { fill: #59636e; font: 600 10.5px system-ui, -apple-system, "Segoe UI", sans-serif; letter-spacing: 0.08em; }
+      .pill    { fill: #ddf4ff; }
+      .pill-t  { fill: #0969da; font: 600 10.5px system-ui, -apple-system, "Segoe UI", sans-serif; letter-spacing: 0.06em; }
+      .flow    { stroke: #0969da; stroke-width: 2; fill: none; }
+      .link    { stroke: #8c959f; stroke-width: 1.25; stroke-dasharray: 4 3; fill: none; }
+      .head    { fill: #0969da; }
+      .head-l  { fill: #8c959f; }
+      @media (prefers-color-scheme: dark) {
+        .bg      { fill: #0d1117; }
+        .card    { fill: #161b22; stroke: #30363d; }
+        .side    { fill: #0d1117; stroke: #6e7681; }
+        .badge   { fill: #4493f8; }
+        .badge-t { fill: #0d1117; }
+        .h1, .name, .text { fill: #e6edf3; }
+        .sub, .out, .tag  { fill: #9198a1; }
+        .pill    { fill: #12263f; }
+        .pill-t  { fill: #4493f8; }
+        .flow    { stroke: #4493f8; }
+        .head    { fill: #4493f8; }
+        .link    { stroke: #6e7681; }
+        .head-l  { fill: #6e7681; }
+      }
+    </style>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path class="head" d="M0,0 L10,5 L0,10 z"/>
+    </marker>
+    <marker id="arrow-l" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path class="head-l" d="M0,0 L10,5 L0,10 z"/>
+    </marker>
+  </defs>
+
+  <rect class="bg" x="0" y="0" width="940" height="640" rx="12"/>
+
+  <!-- Header -->
+  <text class="h1" x="32" y="42">Firefly workflow</text>
+  <text class="sub" x="32" y="64">Invoke each skill as /firefly:&lt;skill&gt;. Solid arrows: the feature pipeline. Dashed: supporting skills.</text>
+
+  <!-- Pipeline arrows (between cards) -->
+  <line class="flow" x1="62" y1="174" x2="62" y2="194" marker-end="url(#arrow)"/>
+  <line class="flow" x1="62" y1="278" x2="62" y2="298" marker-end="url(#arrow)"/>
+  <line class="flow" x1="62" y1="382" x2="62" y2="402" marker-end="url(#arrow)"/>
+  <line class="flow" x1="62" y1="486" x2="62" y2="506" marker-end="url(#arrow)"/>
+
+  <!-- 1. ubiquitous-language -->
+  <rect class="card" x="32" y="92" width="488" height="82" rx="10"/>
+  <circle class="badge" cx="62" cy="133" r="15"/>
+  <text class="badge-t" x="62" y="138" text-anchor="middle">1</text>
+  <text class="name" x="92" y="118">ubiquitous-language</text>
+  <text class="text" x="92" y="139">Build or vet the shared domain glossary</text>
+  <text class="out" x="92" y="160">→ docs/UBIQUITOUS_LANGUAGE.md</text>
+
+  <!-- 2. requisites-interview -->
+  <rect class="card" x="32" y="196" width="488" height="82" rx="10"/>
+  <circle class="badge" cx="62" cy="237" r="15"/>
+  <text class="badge-t" x="62" y="242" text-anchor="middle">2</text>
+  <text class="name" x="92" y="222">requisites-interview</text>
+  <text class="text" x="92" y="243">Surface conflicts, ask closed questions, capture requirements</text>
+  <text class="out" x="92" y="264">→ .workflow/requisites/&lt;id&gt;-&lt;slug&gt;.md</text>
+
+  <!-- 3. create-implementation-plan -->
+  <rect class="card" x="32" y="300" width="488" height="82" rx="10"/>
+  <circle class="badge" cx="62" cy="341" r="15"/>
+  <text class="badge-t" x="62" y="346" text-anchor="middle">3</text>
+  <text class="name" x="92" y="326">create-implementation-plan</text>
+  <text class="text" x="92" y="347">Split into vertical slices and user stories</text>
+  <text class="out" x="92" y="368">→ .workflow/ plan + US-XXX.md  and/or  GitHub issues</text>
+
+  <!-- 4. implement-task -->
+  <rect class="card" x="32" y="404" width="488" height="82" rx="10"/>
+  <circle class="badge" cx="62" cy="445" r="15"/>
+  <text class="badge-t" x="62" y="450" text-anchor="middle">4</text>
+  <text class="name" x="92" y="430">implement-task</text>
+  <text class="text" x="92" y="451">Strict TDD: red → green → refactor, then full + e2e suites</text>
+  <text class="out" x="92" y="472">→ code + tests · workflow files &amp; docs updated</text>
+
+  <!-- 5. review -->
+  <rect class="card" x="32" y="508" width="488" height="82" rx="10"/>
+  <circle class="badge" cx="62" cy="549" r="15"/>
+  <text class="badge-t" x="62" y="554" text-anchor="middle">5</text>
+  <text class="name" x="92" y="534">project-review-methodology</text>
+  <rect class="pill" x="322" y="521" width="120" height="18" rx="9"/>
+  <text class="pill-t" x="382" y="534" text-anchor="middle">ASK FOR A REVIEW</text>
+  <text class="text" x="92" y="555">Quality, tests, performance, product, security, docs</text>
+  <text class="out" x="92" y="576">→ severity-ranked findings report</text>
+
+  <!-- architecture-discussion (any time) -->
+  <rect class="side" x="560" y="92" width="348" height="186" rx="10"/>
+  <text class="tag" x="580" y="118">ANY TIME · OUTSIDE THE PIPELINE</text>
+  <text class="name" x="580" y="142">architecture-discussion</text>
+  <text class="text" x="580" y="166">Explain, review, and find gaps in the design:</text>
+  <text class="text" x="580" y="186">security · scalability · cost · maintainability</text>
+  <text class="text" x="580" y="214">Records a decision when one is reached</text>
+  <text class="out" x="580" y="236">→ docs/adr/NNNN-&lt;title&gt;.md</text>
+
+  <!-- github-project-tracking (shared by 3 and 4) -->
+  <path class="link" d="M520,341 H556" marker-end="url(#arrow-l)"/>
+  <path class="link" d="M520,445 H556" marker-end="url(#arrow-l)"/>
+  <rect class="side" x="560" y="300" width="348" height="186" rx="10"/>
+  <text class="tag" x="580" y="326">SHARED · USED BY STEPS 3 AND 4</text>
+  <text class="name" x="580" y="350">github-project-tracking</text>
+  <text class="text" x="580" y="374">One milestone per feature,</text>
+  <text class="text" x="580" y="394">one issue per user story, in a GitHub Project</text>
+  <text class="text" x="580" y="422">Status: In Progress → Done (only on green)</text>
+  <text class="out" x="580" y="444">→ via the gh CLI (project scope)</text>
+
+  <!-- review sub-skills -->
+  <path class="link" d="M520,549 H556" marker-end="url(#arrow-l)"/>
+  <rect class="side" x="560" y="508" width="348" height="82" rx="10"/>
+  <text class="tag" x="580" y="532">PULLED IN BY STEP 5</text>
+  <text class="out" x="580" y="554">project-review-security</text>
+  <text class="out" x="580" y="572">project-review-testing · -docs-consistency</text>
+
+  <!-- Footer -->
+  <text class="sub" x="32" y="620">Every skill reads docs/PRODUCT.md, docs/ARCHITECTURE.md and the glossary as source of truth.</text>
+</svg>
