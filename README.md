@@ -20,8 +20,8 @@ ubiquitous-language ──► requisites-interview ──► create-implementati
 | --- | --- |
 | `ubiquitous-language` | Extracts a DDD-style glossary of domain terms, flags ambiguities, proposes canonical names, and vets new terms against the existing glossary. Saves to `docs/UBIQUITOUS_LANGUAGE.md`. |
 | `requisites-interview` | Captures requirements for a new feature: reads the product/architecture/glossary docs, surfaces conflicts, asks closed clarifying questions, and writes `.workflow/requisites/<id>-<slug>.md`. |
-| `create-implementation-plan` | Turns a requisites file into a vertical-slice implementation plan plus one user-story file per slice under `.workflow/implementation-plans/` and `.workflow/tasks/`. |
-| `implement-task` | Implements a single task end-to-end with strict TDD (red → green → refactor), runs the full test + e2e suites, and updates the workflow files and docs. |
+| `create-implementation-plan` | Turns a requisites file into a vertical-slice implementation plan plus one user story per slice. Asks whether to write them as local markdown under `.workflow/implementation-plans/` and `.workflow/tasks/`, publish them to GitHub (one milestone per feature, one issue per user story, added to a GitHub Project), or both. |
+| `implement-task` | Implements a single task end-to-end with strict TDD (red → green → refactor), runs the full test + e2e suites, and updates the workflow files and docs. If the task is an issue in a GitHub Project, moves it to In Progress at the start and to Done when finished. |
 | `architecture-discussion` | Discusses how to evolve the architecture, explains implementation/technology aspects, reviews a solution and proposes improvements, and detects gaps across security, scalability, cost-effectiveness, and maintainability. Records an ADR under `docs/adr/` when a decision is reached or when you ask for one. |
 
 
@@ -35,6 +35,14 @@ ubiquitous-language ──► requisites-interview ──► create-implementati
 | `project-review-docs-consistency` | Checks that `docs/PRODUCT.md`, `docs/ARCHITECTURE.md`, READMEs, and comments still match the implementation. |
 
 These skills set `user-invocable: false` — you don't call them directly; the review methodology (or Claude) pulls them in when relevant.
+
+### Shared skills (invoked by other skills)
+
+| Skill | What it does |
+| --- | --- |
+| `github-project-tracking` | Single source of truth for GitHub Projects: issue naming conventions, `gh` preflight, project selection, publishing a plan as a milestone with one issue per user story, locating a task's issue, and moving its Status. Used by `create-implementation-plan` and `implement-task`. Requires the [GitHub CLI](https://cli.github.com/) with the `project` scope (`gh auth refresh -s project`). |
+
+Also `user-invocable: false`.
 
 
 
@@ -69,6 +77,7 @@ firefly-harness-plugin/
 │   ├── requisites-interview/
 │   ├── create-implementation-plan/
 │   ├── implement-task/
+│   ├── github-project-tracking/
 │   ├── architecture-discussion/
 │   ├── project-review-methodology/
 │   ├── project-review-security/
@@ -98,6 +107,8 @@ Inside Claude Code, on any machine:
 After installing, restart Claude Code (or run `/plugin` and reload) so the new skills are picked up.
 
 ## Usage
+
+Plugin skills are namespaced with the plugin name, so you invoke them as `/firefly:<skill>` — e.g. `/firefly:requisites-interview add tags for users`.
 
 Run the workflow skills in order for a new feature:
 

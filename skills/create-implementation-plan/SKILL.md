@@ -1,9 +1,7 @@
 ---
 name: create-implementation-plan
-description: Turn a `.workflow/requisites/<id>-<slug>.md` file into a vertical-slice implementation plan plus one user-story file per slice. Reads PRODUCT.md, ARCHITECTURE.md, UBIQUITOUS_LANGUAGE.md, and the requisites file; writes `.workflow/implementation-plans/<id>-<slug>.md` and `.workflow/tasks/<id>-<slug>/US-XXX.md`. Use AFTER the requisites interview, BEFORE implementation.
+description: Turn a `.workflow/requisites/<id>-<slug>.md` file into a vertical-slice implementation plan plus one user story per slice. Reads PRODUCT.md, ARCHITECTURE.md, UBIQUITOUS_LANGUAGE.md, and the requisites file; asks whether to write the plan locally (`.workflow/implementation-plans/<id>-<slug>.md` + `.workflow/tasks/<id>-<slug>/US-XXX.md`), publish it to a GitHub Project as issues, or both. Use AFTER the requisites interview, BEFORE implementation.
 argument-hint: "<requisites file path, feature slug, ID, or feature name>"
-arguments:
-  - feature_input
 disable-model-invocation: true
 allowed-tools:
   - Read
@@ -11,24 +9,43 @@ allowed-tools:
   - Edit
   - Glob
   - Grep
-  - Bash
+  - Bash(mktemp *)
+  - AskUserQuestion
+  - Skill
 ---
 
-# Demo create implementation plan
+# Create implementation plan
 
-Plan a feature into vertical slices and per-slice user stories. The plan is an index; the user-story files carry the detail.
+Plan the feature `$ARGUMENTS` into vertical slices and per-slice user stories. The plan is an index; the user-story files carry the detail.
 
 ## Process (in order)
 
-1. **Resolve the requisites file** (see "Resolving the input"). If none exists, stop and tell the user to run `/demo-requisites-interview` first.
+1. **Resolve the requisites file** (see "Resolving the input"). If none exists, stop and tell the user to run `/firefly:requisites-interview` first.
 2. Read `./docs/PRODUCT.md`, `./docs/ARCHITECTURE.md`, the requisites file, and `./docs/UBIQUITOUS_LANGUAGE.md` if present. If PRODUCT.md or ARCHITECTURE.md is missing, stop and report.
 3. **Readiness gate**: if requisites status is `Not ready`, stop and report the missing items. If `Ready with assumptions`, proceed but echo the assumptions in the plan Summary.
-4. **Glossary check**: write the plan and task files using canonical terms from `UBIQUITOUS_LANGUAGE.md`. If the requisites file already uses canonical terms, no extra work. If you spot a new/conflicting term, flag it in the final response — don't rewrite the glossary here.
-5. Inspect code only when needed to confirm existing patterns the plan will reuse. Don't survey the whole codebase.
-6. Split into vertical slices (one slice = one independently releasable increment). Split each slice into user stories that are each independently deliverable.
-7. Derive paths (see "Naming").
-8. Write the plan index, then one `US-XXX.md` per story. Skip sections that don't apply — don't fill with "Not applicable".
-9. Final response: just paths and counts (see "Final response").
+4. **Choose the output destination** (see "Output destination"). Always ask — never assume a default. If GitHub is involved, set it up now so it fails before any planning work.
+5. **Glossary check**: write the plan and stories using canonical terms from `UBIQUITOUS_LANGUAGE.md`. If the requisites file already uses canonical terms, no extra work. If you spot a new/conflicting term, flag it in the final response — don't rewrite the glossary here.
+6. Inspect code only when needed to confirm existing patterns the plan will reuse. Don't survey the whole codebase.
+7. Split into vertical slices (one slice = one independently releasable increment). Split each slice into user stories that are each independently deliverable.
+8. Derive paths and titles (see "Naming").
+9. Produce the output for the chosen destination: write the local files (see "Plan output" / "User story output") and/or publish to GitHub (see "Publishing to GitHub"). Skip sections that don't apply — don't fill with "Not applicable".
+10. Final response: just locations and counts (see "Final response").
+
+## Output destination
+
+Ask with a single `AskUserQuestion` call (single-select, header `Destination`):
+
+- Question: "Where should the implementation plan and user stories for `<id>-<slug>` be created?"
+- Options (exactly these three):
+  1. **Local markdown files** — write the plan and `US-XXX.md` files under `.workflow/`.
+  2. **GitHub Project** — create a milestone for the feature (it plays the role of the plan) and one GitHub issue per user story assigned to it, and add the issues to a GitHub Project. No local files.
+  3. **Both** — write the local `.workflow/` files and also publish them to a GitHub Project, cross-linking each file with its issue.
+
+Don't proceed until the user has picked one. If they answer "Other", map it to one of the three options or ask again.
+
+### GitHub setup (options 2 and 3)
+
+**Invoke the `firefly:github-project-tracking` skill now**, before continuing. Don't improvise `gh` commands. From it, run **Preflight**, then **Select project**. If Preflight fails, stop: publishing can't proceed. Keep `<owner>`, `<repo>` and `<project-number>` for step 9.
 
 ## Resolving the input
 
@@ -50,7 +67,9 @@ Given requisites file `.workflow/requisites/<id>-<slug>.md`:
 - Tasks dir: `.workflow/tasks/<id>-<slug>/`
 - Task files: `.workflow/tasks/<id>-<slug>/US-001.md`, `US-002.md`, …
 
-When updating an existing plan, keep `US-XXX` IDs and statuses stable. Don't renumber.
+GitHub issue titles (options 2 and 3) follow the **Conventions** in `firefly:github-project-tracking`.
+
+When updating an existing plan, keep `US-XXX` IDs and statuses stable. Don't renumber. On GitHub, update the existing issues instead of creating duplicates.
 
 ## Rules
 
@@ -64,7 +83,7 @@ When updating an existing plan, keep `US-XXX` IDs and statuses stable. Don't ren
 
 ## Plan output
 
-Write `.workflow/implementation-plans/<id>-<slug>.md`. Required: header, Sources, Summary, Vertical slices, Implementation readiness. Everything else is optional.
+Write `.workflow/implementation-plans/<id>-<slug>.md` (local). On GitHub, its Summary becomes the milestone description. Required: header, Sources, Summary, Vertical slices, Implementation readiness. Everything else is optional.
 
 ```md
 # Implementation plan: <feature name>
@@ -129,7 +148,7 @@ Skip if none.
 
 ## User story output
 
-Write `.workflow/tasks/<id>-<slug>/US-XXX.md`. Required: header, User story, Production deliverable, Acceptance criteria. Everything else is optional.
+Write `.workflow/tasks/<id>-<slug>/US-XXX.md` (local). On GitHub, the same sections form the story issue body. Required: header, User story, Production deliverable, Acceptance criteria. Everything else is optional.
 
 ````md
 # US-XXX: <title>
@@ -171,11 +190,22 @@ Add scenarios until the main paths and one or two edge cases are covered (usuall
 Include only if they carry information the implementer can't derive from the requisites + architecture docs.
 ````
 
+## Publishing to GitHub
+
+Only for options 2 (GitHub Project) and 3 (Both). Build the milestone description from the plan Summary and each story issue body from the "User story output" sections, using the GitHub header and title conventions of `firefly:github-project-tracking` (no `.workflow/` paths). Write the bodies to a temp dir (`mktemp -d`), never under `.workflow/`. In option 3, write the local files first.
+
+Then run the **Publish plan** operation of `firefly:github-project-tracking` (already loaded in step 4) with the milestone description, the story bodies and the selected project. In option 3, that operation also cross-links the local files with their issues and milestone.
+
+In option 2, plan-level content beyond the Summary (cross-slice dependencies, global risks/open questions) has no home on GitHub: put it in the stories it affects, and list anything left over in the final response.
+
 ## Quality checklist (run before reporting done)
 
+- The user picked the destination via `AskUserQuestion`; the output matches that choice.
 - Requisites file exists and was the source.
-- Plan path uses the same `<id>-<slug>` as the requisites file.
-- Every `US-XXX` in the plan has a matching file under `.workflow/tasks/<id>-<slug>/`.
+- Plan path / issue titles use the same `<id>-<slug>` as the requisites file, and issue titles follow the `github-project-tracking` conventions.
+- Local: every `US-XXX` in the plan has a matching file under `.workflow/tasks/<id>-<slug>/`.
+- GitHub: the feature milestone exists with the plan Summary as description; every `US-XXX` has exactly one issue in that milestone, and all of them are in the chosen project.
+- Both: every local file links its issue, and vice versa.
 - No technical-layer groupings, no testing section.
 - No "Not applicable" fillers.
 - Canonical glossary terms used throughout.
@@ -183,11 +213,12 @@ Include only if they carry information the implementer can't derive from the req
 ## Final response
 
 Return only:
-- plan path
-- tasks dir
+- destination (local / GitHub Project / both)
+- plan path and tasks dir (if local)
+- GitHub project URL and milestone URL, plus created/updated issue counts (if GitHub)
 - requisites path
 - slices count / user stories count
 - readiness
 - open questions count
-- `glossary update needed: <terms>` if step 4 surfaced any new/conflicting terms
+- `glossary update needed: <terms>` if step 5 surfaced any new/conflicting terms
 - critical blockers, if any

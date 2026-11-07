@@ -144,7 +144,7 @@ This is the only case where this skill edits an existing file other than the ADR
 
 ## Rules
 
-- **Discuss and record only.** Never edit source code or `docs/ARCHITECTURE.md` / `docs/PRODUCT.md` from this skill — propose changes and let the user run the implementation/requisites skills.
+- **Discuss and record only.** Never edit source code or `docs/ARCHITECTURE.md` / `docs/PRODUCT.md` from this skill — propose changes and point the user to `/firefly:requisites-interview` or `/firefly:implement-task`.
 - **One ADR per decision.** Don't bundle unrelated decisions.
 - **No invented decisions.** If the user hasn't actually decided, leave the ADR as `Proposed` or don't write one.
 - **Cite real evidence.** Reference actual files, ADRs, and docs — not assumptions.

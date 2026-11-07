@@ -1,8 +1,15 @@
 ---
 name: ubiquitous-language
-description: Extract a DDD-style ubiquitous language glossary from the current conversation, flagging ambiguities and proposing canonical terms. Also acts as a gatekeeper for new terms introduced by a single requirement or feature spec. Saves to UBIQUITOUS_LANGUAGE.md. Use when user wants to define domain terms, build a glossary, harden terminology, vet a new term against the existing glossary, or mentions "domain model" or "DDD".
+description: Extract a DDD-style ubiquitous language glossary from the current conversation, flagging ambiguities and proposing canonical terms. Also acts as a gatekeeper for new terms introduced by a single requirement or feature spec. Saves to docs/UBIQUITOUS_LANGUAGE.md. Use when user wants to define domain terms, build a glossary, harden terminology, vet a new term against the existing glossary, or mentions "domain model" or "DDD".
 argument-hint: "<optional: a new term, a phrase, or a path to a requisites file>"
 disable-model-invocation: true
+allowed-tools:
+  - Read
+  - Write
+  - Edit
+  - Glob
+  - Grep
+  - AskUserQuestion
 ---
 
 # Ubiquitous Language
@@ -20,14 +27,16 @@ If unsure, default to Sweep mode.
 
 ## Sweep process
 
-1. **Scan the conversation** for domain-relevant nouns, verbs, and concepts
-2. **Identify problems**:
+1. **Load what already exists.** If `./docs/UBIQUITOUS_LANGUAGE.md` exists, read it — Sweep **merges** into it, it never starts from scratch or silently drops existing terms. Also skim `./docs/PRODUCT.md` and `./docs/ARCHITECTURE.md` if present, for terms already in use.
+2. **Scan the conversation** for domain-relevant nouns, verbs, and concepts
+3. **Identify problems**:
    - Same word used for different concepts (ambiguity)
    - Different words used for the same concept (synonyms)
    - Vague or overloaded terms
-3. **Propose a canonical glossary** with opinionated term choices
-4. **Write to `./docs/UBIQUITOUS_LANGUAGE.md`** in the working directory using the format below
-5. **Output a summary** inline in the conversation
+   - Conversation usage that contradicts an existing glossary definition
+4. **Propose a canonical glossary** with opinionated term choices. If the change renames or removes an existing canonical term, confirm it with the user via `AskUserQuestion` first — other specs and code may depend on it.
+5. **Write to `./docs/UBIQUITOUS_LANGUAGE.md`** using the format below (create `docs/` if needed). When the file already existed: incorporate new terms, update definitions whose understanding has evolved, re-flag new ambiguities, and rewrite the example dialogue to cover the new terms.
+6. **Output a summary** inline in the conversation: terms added, changed, aliased, and ambiguities flagged.
 
 ## Challenge process
 
@@ -107,30 +116,8 @@ Write a `./docs/UBIQUITOUS_LANGUAGE.md` file with this structure:
 - **Show relationships.** Use bold term names and express cardinality where obvious.
 - **Only include domain terms.** Skip generic programming concepts (array, function, endpoint) unless they have domain-specific meaning.
 - **Group terms into multiple tables** when natural clusters emerge (e.g. by subdomain, lifecycle, or actor). Each group gets its own heading and table. If all terms belong to a single cohesive domain, one table is fine — don't force groupings.
-- **Write an example dialogue.** A short conversation (3-5 exchanges) between a dev and a domain expert that demonstrates how the terms interact naturally. The dialogue should clarify boundaries between related concepts and show terms being used precisely.
-
-<example>
-
-## Example dialogue
-
-> **Dev:** "How do I test the **sync service** without Docker?"
-
-> **Domain expert:** "Provide the **filesystem layer** instead of the **Docker layer**. It implements the same **Sandbox service** interface but uses a local directory as the **sandbox**."
-
-> **Dev:** "So **sync-in** still creates a **bundle** and unpacks it?"
-
-> **Domain expert:** "Exactly. The **sync service** doesn't know which layer it's talking to. It calls `exec` and `copyIn` — the **filesystem layer** just runs those as local shell commands."
-
-</example>
+- **Write an example dialogue.** A short conversation (3-5 exchanges) between a dev and a domain expert that demonstrates how the terms interact naturally. The dialogue should clarify boundaries between related concepts and show terms being used precisely. The template above is only a format example — always write the dialogue in *this* project's domain.
 
 ## Re-running
 
-When invoked again in the same conversation (Sweep mode):
-
-1. Read the existing `./docs/UBIQUITOUS_LANGUAGE.md`
-2. Incorporate any new terms from subsequent discussion
-3. Update definitions if understanding has evolved
-4. Re-flag any new ambiguities
-5. Rewrite the example dialogue to incorporate new terms
-
-Challenge mode is idempotent — re-running with the same input should produce no changes once verdicts are applied.
+Both modes are safe to re-run: Sweep merges into the existing file (see step 1), and Challenge mode is idempotent — re-running with the same input should produce no changes once verdicts are applied.

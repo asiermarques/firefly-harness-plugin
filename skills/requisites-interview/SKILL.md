@@ -2,8 +2,6 @@
 name: requisites-interview
 description: Capture requirements for a new feature before implementation planning. Reads ./docs/PRODUCT.md, ./docs/ARCHITECTURE.md, and ./docs/UBIQUITOUS_LANGUAGE.md, surfaces conflicts with existing product decisions and domain terminology, asks closed clarifying questions, and writes .workflow/requisites/<id>-<english-feature-slug>.md. Use BEFORE planning or implementation, not for in-flight tasks.
 argument-hint: "<feature request, feature name, slug, or existing requisites file>"
-arguments:
-  - feature_input
 disable-model-invocation: true
 allowed-tools:
   - Read
@@ -11,10 +9,10 @@ allowed-tools:
   - Edit
   - Glob
   - Grep
-  - Bash
+  - AskUserQuestion
 ---
 
-# Demo requisites interview
+# Requisites interview
 
 Capture requirements for `$ARGUMENTS` under `.workflow/requisites/` before any planning. Optimize for a sharp problem statement, not a comprehensive design doc.
 
@@ -28,7 +26,7 @@ Capture requirements for `$ARGUMENTS` under `.workflow/requisites/` before any p
 6. Ask clarifying questions (see "Question rules"). Max 2 rounds.
 7. Derive `requirement_id`, `feature_slug`, `requirements_path` (see "Naming").
 8. Write the doc (see "Output"). Use canonical glossary terms throughout — do not introduce synonyms. Skip sections that don't apply — don't fill with "Not applicable".
-9. Final response: path, status, open questions count, AND a `glossary update needed: <terms>` line if any new/conflicting terms were confirmed in step 4. The implementer should re-run `/ubiquitous-language <term-or-this-file-path>` (Challenge mode) before coding.
+9. Final response: path, status, open questions count, AND a `glossary update needed: <terms>` line if any new/conflicting terms were confirmed in step 4. The implementer should re-run `/firefly:ubiquitous-language <term-or-this-file-path>` (Challenge mode) before coding.
 
 ## Question rules
 
@@ -149,4 +147,5 @@ Return only:
 - status
 - open questions count
 - any product-decision change the implementer must apply (e.g. "PRODUCT.md update needed")
-- `glossary update needed: <terms>` if step 4 confirmed any new, renamed, or conflicting terms — implementer runs `/ubiquitous-language <requisites-path>` (Challenge mode) before coding
+- `glossary update needed: <terms>` if step 4 confirmed any new, renamed, or conflicting terms — implementer runs `/firefly:ubiquitous-language <requisites-path>` (Challenge mode) before coding
+- next step: `/firefly:create-implementation-plan <requisites-path>` (only if status isn't `Not ready`)

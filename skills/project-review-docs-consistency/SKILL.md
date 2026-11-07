@@ -1,82 +1,83 @@
 ---
 name: project-review-docs-consistency
-description: Check whether docs/PRODUCT.md, docs/ARCHITECTURE.md, README files, and inline comments accurately reflect the current implementation.
+description: Find documentation drift — check whether docs/PRODUCT.md, docs/ARCHITECTURE.md, docs/UBIQUITOUS_LANGUAGE.md, docs/DESIGN.md, ADRs, READMEs, CLAUDE.md, and inline comments still match the current implementation. Use when reviewing changes for doc accuracy, or as the documentation dimension of project-review-methodology.
 user-invocable: false
 allowed-tools:
   - Read
   - Glob
   - Grep
-  - Bash
+  - Bash(git status *)
+  - Bash(git diff *)
+  - Bash(git log *)
+  - Bash(git show *)
 ---
 
 # Project docs consistency review
 
-Use this skill to find documentation drift between the current implementation and project documentation.
+Find drift between the implementation and the project documentation. Focus on the docs affected by the code in scope (the caller's scope, or the current changes from `git diff` if none is given). This skill **reviews only** — don't update documentation unless explicitly asked.
 
-## Required docs
+## Docs to check
 
-Read:
+Read the ones that exist:
 
 - `docs/PRODUCT.md`
 - `docs/ARCHITECTURE.md`
-- `README.md`
+- `docs/UBIQUITOUS_LANGUAGE.md`
+- `docs/DESIGN.md`
+- `docs/adr/*.md`
+- `README.md` and any other README or setup docs
+- `CLAUDE.md`
 
-Also inspect README or setup docs if relevant.
+A missing doc that the project clearly needs (e.g. no `docs/ARCHITECTURE.md` in a multi-module codebase) is itself a finding.
 
 ## Review checks
 
-Compare documentation against the codebase.
+Compare each doc against the codebase.
 
-Check whether `docs/PRODUCT.md` accurately describes:
+`docs/PRODUCT.md` — does it accurately describe:
 
-- implemented features
-- planned features
+- implemented vs. planned features
 - user flows
-- product constraints
-- business rules
-- deliberate exclusions
-- metrics behavior
-- the decision that metrics use raw counts only, with no goals or targets
-- incorrect or outdated directory or filename references
+- business rules and product constraints
+- deliberate exclusions and product decisions (things the product intentionally does *not* do)
+- directory or filename references
 
-Check whether `docs/ARCHITECTURE.md` accurately describes:
+`docs/ARCHITECTURE.md` — does it accurately describe:
 
-- current folder structure
-- vertical slice boundaries
+- current folder structure and slice boundaries
 - frontend/backend split
 - API patterns
 - database / data-access usage
-- commands
-- aliases
+- commands and path aliases
 - test conventions
 - styling / design-system setup
-- integration points
-- known constraints
+- integration points and known constraints
 
-Check other docs for:
+`docs/UBIQUITOUS_LANGUAGE.md` — do code, UI copy, and other docs use the canonical terms? Flag aliases-to-avoid that appear in new code, and domain concepts in code that are missing from the glossary.
+
+`docs/DESIGN.md` — does it match how styles and design tokens are actually defined? Flag docs or code that assume an outdated styling configuration.
+
+ADRs — does the implementation contradict an `Accepted` ADR without a superseding one?
+
+Other docs and comments:
 
 - outdated setup commands
-- incorrect paths
+- incorrect paths, references to removed files
 - stale examples
-- references to removed files
 - comments that describe old behavior
-- mismatch between planned and implemented state
-
-## Styling / design-system check
-
-Flag documentation or code that assumes an outdated styling or design-system configuration when the project has since changed how styles or design tokens are defined.
+- mismatch between planned and implemented state (including `.workflow/` plans and task statuses, if present)
 
 ## Output
 
-Return documentation findings only.
+Return documentation findings only, most-severe first, using the severity scale of `firefly:project-review-methodology` (Critical / High / Medium / Low).
 
-For each finding, include:
+For each finding:
 
-- Severity:
-- File/location:
-- Current documentation:
-- Actual implementation:
-- Why it matters:
-- Recommended fix:
+- **Severity:**
+- **File/location:** `path:line` of the doc
+- **Current documentation:**
+- **Actual implementation:** with the `path:line` that proves it
+- **Why it matters:**
+- **Recommended fix:** the concrete wording or section to change
 
-Do not update documentation unless explicitly asked.
+If the docs in scope are consistent, say so explicitly.
